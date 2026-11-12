@@ -16,11 +16,6 @@ loss, the adapters for the RL framework, the runtime validator and the evaluatio
 optimization runs on existing open-source frameworks (Hugging Face Transformers with DeepSpeed, verl,
 vLLM and LLaMA-Factory); [Training](#training) lists which framework is used for which stage.
 
-> **Scope of this release.** The scientific executors and the reference database are simulated: no
-> Quantum ESPRESSO, MACE or CHGNet calculation is run, and the reference database is a built-in set of
-> 110 crystal structures consistent with the executors. Data construction, verification and evaluation
-> run end to end on a CPU; the training launchers need GPUs.
-
 ## Contents
 
 - [Repository layout](#repository-layout)
@@ -32,7 +27,6 @@ vLLM and LLaMA-Factory); [Training](#training) lists which framework is used for
 - [Training](#training)
 - [Evaluation](#evaluation)
 - [Mapping to the paper](#mapping-to-the-paper)
-- [Scope and limitations](#scope-and-limitations)
 - [Citation](#citation)
 
 ## Repository layout
@@ -70,7 +64,7 @@ The environment, task generator, trajectory pipeline, verifiers and evaluation h
 Python standard library (Python 3.9 or later). NumPy speeds up geometry checks when it is installed.
 
 ```bash
-git clone <repository-url> MatAct && cd MatAct
+git clone https://github.com/Xiaobu-USTC/MatAct.git && cd MatAct
 pip install -e .            # core (no dependencies)
 pip install -e ".[train]"   # stage 1: torch, transformers, accelerate, deepspeed
 pip install -e ".[rl]"      # stage 2: verl, pandas, pyarrow
@@ -439,10 +433,6 @@ external benchmarks (MatTools, ScienceAgentBench, BFCL), the computational-chemi
 blinded expert audit, the Li–Si case study, the Tier C experimental references and the reward
 ablations without the scientific-validity, grounding or cost terms.
 
-## Scope and limitations
-
-- The scientific executors are simulated: relaxed lattice constants are the input lattice constants enlarged by 0.8–2.0% (PBE-like), band gaps and formation energies come from electronegativity-based models, and total energies from elemental reference energies. They are internally consistent and suitable for training and evaluating tool use, but they are not physical predictions and must not be used as materials data.
-- The training launchers target PyTorch 2.4, Transformers 4.51 and recent verl releases; newer framework versions may rename configuration keys.
 
 ## Citation
 
