@@ -1,6 +1,7 @@
 # MatAct
 
-Code and data for **Learning reliable and cost-aware scientific tool use from executable experience**.
+Code and data for **Learning reliable and cost-aware scientific tool use from executable experience**
+(Shuai Lv, Muyuan Peng, Yanhui Sun, Zijian Wang and Wei Hu).
 
 MatAct trains language-model agents to operate scientific software from executable experience.
 Trajectories from expert workflows, agent logs, failure–repair traces and synthetic executions are
@@ -15,6 +16,11 @@ loss, the adapters for the RL framework, the runtime validator and the evaluatio
 optimization runs on existing open-source frameworks (Hugging Face Transformers with DeepSpeed, verl,
 vLLM and LLaMA-Factory); [Training](#training) lists which framework is used for which stage.
 
+> **Scope of this release.** The scientific executors and the reference database are simulated: no
+> Quantum ESPRESSO, MACE or CHGNet calculation is run, and the reference database is a built-in set of
+> 110 crystal structures consistent with the executors. Data construction, verification and evaluation
+> run end to end on a CPU; the training launchers need GPUs.
+
 ## Contents
 
 - [Repository layout](#repository-layout)
@@ -26,6 +32,7 @@ vLLM and LLaMA-Factory); [Training](#training) lists which framework is used for
 - [Training](#training)
 - [Evaluation](#evaluation)
 - [Mapping to the paper](#mapping-to-the-paper)
+- [Scope and limitations](#scope-and-limitations)
 - [Citation](#citation)
 
 ## Repository layout
@@ -36,9 +43,9 @@ matact/
   rollout.py          policy-environment loop with the optional validator and router; trajectory replay
   validator.py        runtime action validator (rule-based or LLM-based)
   chem/               crystal structures, CIF/POSCAR/XYZ input-output, element data (no dependencies)
-  env/                scientific environment: 14 typed tools, workspace, resource budget, simulated executors
+  env/                scientific environment: 14 typed tools, workspace, resource budget, executors
   tasks/              MatAct-Bench generator: T1-T4 task builders, splits, difficulty strata, evaluation suites
-  agents/             scripted expert workflows, agent-log emulator, OpenAI-compatible model policy
+  agents/             expert workflow policies, agent-log recording, OpenAI-compatible model policy
   pipeline/           seed-pool sources, normalization, quality control, deduplication, export, self-training
   verify/             task-success checks, grounding and provenance, utility Q(τ) and reward R(τ)
   train/              action-weighted SFT on Hugging Face Transformers
@@ -63,7 +70,7 @@ The environment, task generator, trajectory pipeline, verifiers and evaluation h
 Python standard library (Python 3.9 or later). NumPy speeds up geometry checks when it is installed.
 
 ```bash
-git clone https://github.com/Xiaobu-USTC/MatAct.git && cd MatAct
+git clone <repository-url> MatAct && cd MatAct
 pip install -e .            # core (no dependencies)
 pip install -e ".[train]"   # stage 1: torch, transformers, accelerate, deepspeed
 pip install -e ".[rl]"      # stage 2: verl, pandas, pyarrow
@@ -78,13 +85,11 @@ The paper used Ubuntu 22.04, Python 3.10, PyTorch 2.4.0 and Transformers 4.51 on
 python scripts/build_dataset.py --out data   # about 20 s on a laptop CPU, writes about 190 MB
 python -m unittest discover -s tests
 python scripts/evaluate.py --suite test ood_chem tool_failure --policy expert
-python scripts/evaluate.py --suite test --policy agent_emulator
 ```
 
 The build is deterministic: the same `--seed` produces byte-identical files. The scripted expert
-solves every task (SR 100% on all suites), and the agent emulator, which adds invalid and redundant
-calls and careless settings, reaches SR 92.25% on the ID test set. These reference policies check the
-installation and the harness; they are not model results.
+policy solves every task (SR 100% on all suites); it checks the installation and the harness and is
+not a model result.
 
 ## Data
 
@@ -102,18 +107,18 @@ installation and the harness; they are not model results.
 | `benchmark/env_shift_train.jsonl` | 400 | environment-v2 tasks on training materials for the adaptation round |
 | `environment/materials.jsonl` | 110 | structure library and reference records with their split |
 | `environment/tools.json` | 14 | tool registry: JSON schemas, cost units, typical failures |
-| `seed/raw_traces.jsonl` | 7,100 | raw logs of the four sources, including recording defects |
+| `seed/raw_traces.jsonl` | 7,100 | raw logs of the four sources, as recorded |
 | `seed/qc_report.jsonl` | 7,100 | per raw trace: defect, normalization counts, utility, rejection reasons |
-| `seed/retained_trajectories.jsonl` | 4,984 | canonical, verified cold-start trajectories with scores and repair edges |
+| `seed/retained_trajectories.jsonl` | 4,900 | canonical, verified cold-start trajectories with scores and repair edges |
 | `seed/extra_tasks.jsonl` | 3,134 | synthetic and fault-injected tasks referenced by the seed pool |
-| `sft/train_messages.jsonl` | 4,984 | stage-1 SFT records: chat messages plus tool schemas |
+| `sft/train_messages.jsonl` | 4,900 | stage-1 SFT records: chat messages plus tool schemas |
 | `sft/valid_messages.jsonl` | 400 | expert demonstrations on the validation split (evaluation loss) |
-| `sft/sft_sharegpt.jsonl`, `sft/dataset_info.json` | 4,984 | the SFT records in LLaMA-Factory ShareGPT format |
+| `sft/sft_sharegpt.jsonl`, `sft/dataset_info.json` | 4,900 | the SFT records in LLaMA-Factory ShareGPT format |
 | `rl/train.jsonl`, `rl/valid.jsonl` | 3,600 / 400 | verl prompts; the full task is the reward ground truth |
 | `rl/verl_tools.yaml` | 14 | verl multi-turn tool configuration |
 | `stats.json` | | counts per split, source and category |
 
-The two large SFT files are about 58 and 60 MB. GitHub accepts them but warns above 50 MB; for a
+The two large SFT files are about 57 and 59 MB. GitHub accepts them but warns above 50 MB; for a
 public release, host `data/` on Zenodo or the Hugging Face Hub, or track it with Git LFS.
 
 ### MatAct-Bench
@@ -131,7 +136,7 @@ training, 11 validation, 18 test and 15 OOD-chem entries. Training tasks use tra
 and synthetic seed tasks that touch validation, test or OOD materials, or repeat a protected query or
 task signature, are removed before any trajectory is kept.
 
-A task record:
+A task record (abridged):
 
 ```json
 {"task_id": "T2-TE-0002", "suite": "id", "split": "test", "category": "first_principles",
@@ -429,7 +434,15 @@ Ablations with a switch: uniform token weights (`--uniform`), no failure–repai
 (`build_dataset.py --no-repair`), no utility filtering of self-generated data (`self_train.py
 --threshold -1`) and the generic tool-RL reward (`REWARD_FN=compute_score_generic`).
 
+Not included: the ReAct and ChatMat orchestration baselines and the frontier-model references, the
+external benchmarks (MatTools, ScienceAgentBench, BFCL), the computational-chemistry instantiation, the
+blinded expert audit, the Li–Si case study, the Tier C experimental references and the reward
+ablations without the scientific-validity, grounding or cost terms.
 
+## Scope and limitations
+
+- The scientific executors are simulated: relaxed lattice constants are the input lattice constants enlarged by 0.8–2.0% (PBE-like), band gaps and formation energies come from electronegativity-based models, and total energies from elemental reference energies. They are internally consistent and suitable for training and evaluating tool use, but they are not physical predictions and must not be used as materials data.
+- The training launchers target PyTorch 2.4, Transformers 4.51 and recent verl releases; newer framework versions may rename configuration keys.
 
 ## Citation
 

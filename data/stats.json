@@ -1,0 +1,153 @@
+{
+  "benchmark": {
+    "train": {
+      "structure/regular": 450,
+      "first_principles/regular": 450,
+      "ml_potential/regular": 450,
+      "database/regular": 450,
+      "structure/missing_data": 180,
+      "first_principles/missing_data": 180,
+      "ml_potential/missing_data": 180,
+      "database/missing_data": 180,
+      "structure/tool_failure": 135,
+      "structure/long_horizon": 135,
+      "first_principles/long_horizon": 135,
+      "first_principles/tool_failure": 135,
+      "ml_potential/long_horizon": 135,
+      "ml_potential/tool_failure": 135,
+      "database/tool_failure": 135,
+      "database/long_horizon": 135
+    },
+    "valid": {
+      "structure/regular": 50,
+      "first_principles/regular": 50,
+      "ml_potential/regular": 50,
+      "database/regular": 50,
+      "structure/missing_data": 20,
+      "first_principles/missing_data": 20,
+      "ml_potential/missing_data": 20,
+      "database/missing_data": 20,
+      "structure/tool_failure": 15,
+      "structure/long_horizon": 15,
+      "first_principles/tool_failure": 15,
+      "first_principles/long_horizon": 15,
+      "ml_potential/long_horizon": 15,
+      "ml_potential/tool_failure": 15,
+      "database/long_horizon": 15,
+      "database/tool_failure": 15
+    },
+    "test": {
+      "structure/regular": 50,
+      "first_principles/regular": 50,
+      "ml_potential/regular": 50,
+      "database/regular": 50,
+      "structure/missing_data": 20,
+      "first_principles/missing_data": 20,
+      "ml_potential/missing_data": 20,
+      "database/missing_data": 20,
+      "structure/long_horizon": 15,
+      "structure/tool_failure": 15,
+      "first_principles/tool_failure": 15,
+      "first_principles/long_horizon": 15,
+      "ml_potential/tool_failure": 15,
+      "ml_potential/long_horizon": 15,
+      "database/long_horizon": 15,
+      "database/tool_failure": 15
+    }
+  },
+  "benchmark_sizes": {
+    "train": 3600,
+    "valid": 400,
+    "test": 400,
+    "ood_chem": 100,
+    "ood_comp": 100,
+    "paraphrase": 1200,
+    "tool_failure": 100,
+    "env_shift": 100,
+    "stress": 200,
+    "env_shift_train": 400
+  },
+  "seed_pool": {
+    "sources": {
+      "expert": {
+        "raw": 1500,
+        "retained": 1260,
+        "keep_rate": 0.84
+      },
+      "agent": {
+        "raw": 2000,
+        "retained": 1180,
+        "keep_rate": 0.59
+      },
+      "repair": {
+        "raw": 1200,
+        "retained": 840,
+        "keep_rate": 0.7
+      },
+      "synthetic": {
+        "raw": 2400,
+        "retained": 1620,
+        "keep_rate": 0.675
+      },
+      "total": {
+        "raw": 7100,
+        "retained": 4900,
+        "keep_rate": 0.69
+      }
+    },
+    "first_rejection_reason": {
+      "expert": {
+        "missing observation": 115,
+        "duplicate": 81,
+        "unsupported conclusion": 44
+      },
+      "agent": {
+        "duplicate": 403,
+        "missing completion state": 205,
+        "missing observation": 72,
+        "unsupported conclusion": 56,
+        "unrecoverable parser error": 47,
+        "unverifiable artifacts": 37
+      },
+      "repair": {
+        "duplicate": 198,
+        "missing observation": 72,
+        "unsupported conclusion": 64,
+        "missing completion state": 26
+      },
+      "synthetic": {
+        "overlaps validation/test materials": 549,
+        "duplicate": 108,
+        "missing observation": 101,
+        "duplicates a validation/test query": 22
+      }
+    }
+  },
+  "sft": {
+    "train_records": 4900,
+    "valid_records": 400,
+    "by_source": {
+      "expert": 1260,
+      "agent": 1180,
+      "repair": 840,
+      "synthetic": 1620
+    },
+    "by_category": {
+      "ml_potential": 1413,
+      "structure": 1041,
+      "database": 1123,
+      "first_principles": 1323
+    },
+    "message_chars": {
+      "median": 4047,
+      "p95": 5405,
+      "max": 6235
+    }
+  },
+  "rl": {
+    "train_prompts": 3600,
+    "valid_prompts": 400
+  },
+  "seed": 0,
+  "scale": 1.0
+}

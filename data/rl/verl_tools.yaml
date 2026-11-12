@@ -1,0 +1,541 @@
+{
+  "tools": [
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "structure.search",
+          "description": "Search the structure library by reduced formula, elements and/or prototype.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "formula": {
+                "type": "string"
+              },
+              "elements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "prototype": {
+                "type": "string",
+                "enum": [
+                  "fcc",
+                  "bcc",
+                  "diamond",
+                  "rocksalt",
+                  "zincblende",
+                  "cscl",
+                  "fluorite",
+                  "perovskite",
+                  "wurtzite"
+                ]
+              },
+              "limit": {
+                "type": "integer"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "structure.load",
+          "description": "Parse a structure file in the workspace (CIF, POSCAR or extended XYZ).",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              }
+            },
+            "required": [
+              "uri"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "structure.validate",
+          "description": "Validate a parsed structure (interatomic distances, lattice, composition) and store a canonical copy under workspace://validated/.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              },
+              "min_distance_A": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "uri"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "structure.convert",
+          "description": "Write a parsed structure as CIF, POSCAR or XYZ, optionally as a supercell or with near-duplicate sites merged (merge_tol_A).",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "cif",
+                  "poscar",
+                  "xyz"
+                ]
+              },
+              "supercell": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "merge_tol_A": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "uri",
+              "format"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "dft.prepare",
+          "description": "Prepare a plane-wave DFT calculation for a validated structure. Metals need smearing.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "structure_uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              },
+              "code": {
+                "type": "string"
+              },
+              "cutoff_eV": {
+                "type": "number"
+              },
+              "k_mesh": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "relax": {
+                "type": "boolean"
+              },
+              "smearing": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "gaussian",
+                  "mv"
+                ]
+              },
+              "mixing_beta": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "structure_uri",
+              "code",
+              "cutoff_eV",
+              "k_mesh",
+              "relax"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "dft.run",
+          "description": "Run a prepared DFT calculation; the run is killed when it exceeds max_cpu_hours.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "input_uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              },
+              "max_cpu_hours": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "input_uri",
+              "max_cpu_hours"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "result.extract",
+          "description": "Extract properties from a finished DFT run.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "output_uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "total_energy_eV",
+                    "energy_per_atom_eV",
+                    "lattice_a_A",
+                    "lattice_c_A",
+                    "band_gap_eV",
+                    "max_force_eV_A",
+                    "pressure_kbar",
+                    "converged"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "output_uri",
+              "fields"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "mlp.select",
+          "description": "Select the cheapest registered ML interatomic potential that supports the elements and task within max_cost. Give elements or structure_uri.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "task": {
+                "type": "string",
+                "enum": [
+                  "energy_forces",
+                  "relaxation",
+                  "md"
+                ]
+              },
+              "elements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "structure_uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              },
+              "max_cost": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "task",
+              "max_cost"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "mlp.train",
+          "description": "Fine-tune a registered potential (or 'scratch') on a labelled dataset.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "dataset_uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              },
+              "base_model": {
+                "type": "string"
+              },
+              "epochs": {
+                "type": "integer"
+              },
+              "learning_rate": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "dataset_uri",
+              "base_model",
+              "epochs"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "mlp.evaluate",
+          "description": "Evaluate an ML potential on a labelled test set (energy and force MAE).",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "model_uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              },
+              "test_uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              }
+            },
+            "required": [
+              "model_uri",
+              "test_uri"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "database.query",
+          "description": "Query materials-property records. filters may use: material_id, material_ids, formula, prototype, elements, band_gap_min, band_gap_max, is_metal, property.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string",
+                "enum": [
+                  "matact_refdb",
+                  "matact_userdb"
+                ]
+              },
+              "filters": {
+                "type": "object"
+              },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "limit": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "database",
+              "filters"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "database.update",
+          "description": "Insert or update a record in the user database. Required record fields: material_id, formula, property, value, unit, source_uri.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string",
+                "enum": [
+                  "matact_userdb"
+                ]
+              },
+              "record": {
+                "type": "object"
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "insert",
+                  "update"
+                ]
+              }
+            },
+            "required": [
+              "database",
+              "record",
+              "mode"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "artifact.inspect",
+          "description": "Show the metadata and checksum of an artifact, or list a directory (URI ending in '/').",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "uri": {
+                "type": "string",
+                "description": "workspace:// URI"
+              }
+            },
+            "required": [
+              "uri"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "class_name": "matact.integrations.verl_tools.MatActTool",
+      "config": {
+        "type": "native"
+      },
+      "tool_schema": {
+        "type": "function",
+        "function": {
+          "name": "code.execute",
+          "description": "Run a registered workspace script: split_dataset(dataset_uri, test_fraction, seed) or convert_units(value, from_unit, to_unit).",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "script": {
+                "type": "string",
+                "enum": [
+                  "split_dataset",
+                  "convert_units"
+                ]
+              },
+              "arguments": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "script",
+              "arguments"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ]
+}

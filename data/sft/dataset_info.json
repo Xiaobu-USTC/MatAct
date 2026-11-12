@@ -1,0 +1,11 @@
+{
+  "matact_sft": {
+    "file_name": "sft_sharegpt.jsonl",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "system": "system",
+      "tools": "tools"
+    }
+  }
+}
