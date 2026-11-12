@@ -1,7 +1,7 @@
 # MatAct
 
 Code and data for **Learning reliable and cost-aware scientific tool use from executable experience**
-(Shuai Lv, Muyuan Peng, Yanhui Sun, Zijian Wang and Wei Hu).
+(Shuai Lv, Muyuan Peng, Yanhui Sun, Zijian Wang and Wei Hu*).
 
 MatAct trains language-model agents to operate scientific software from executable experience.
 Trajectories from expert workflows, agent logs, failure–repair traces and synthetic executions are
